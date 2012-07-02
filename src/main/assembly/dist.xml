@@ -1,0 +1,71 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
+	<id>dist</id>
+	
+	<formats>
+		<format>zip</format>
+		<format>tar.gz</format>
+	</formats>
+  
+	<includeBaseDirectory>false</includeBaseDirectory>
+	
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/sitecake/${project.version}/client</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
+			<unpack>true</unpack>
+			<directoryMode>0755</directoryMode>
+			<includes>
+				<include>com.sitecake:sitecake-editor-client</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+	
+	<fileSets>	
+		<fileSet>
+			<outputDirectory>/</outputDirectory>
+			<directory>target/classes</directory>
+			<directoryMode>0755</directoryMode>
+			<includes>
+				<include>sc-admin.php</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/sitecake/${project.version}/server/lib</outputDirectory>
+			<directory>src/main/lib</directory>
+			<directoryMode>0755</directoryMode>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>		
+		<fileSet>
+			<outputDirectory>/sitecake/${project.version}/server</outputDirectory>
+			<directory>src/main/php</directory>
+			<directoryMode>0755</directoryMode>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>		
+		<fileSet>
+			<outputDirectory>/sitecake</outputDirectory>
+			<directory>src/main/resources</directory>
+			<directoryMode>0755</directoryMode>
+			<includes>
+				<include>editor.cfg</include>
+				<include>credential.php</include>
+				<include>credential.php.default</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/sitecake/${project.version}/server</outputDirectory>
+			<directory>src/main/resources</directory>
+			<directoryMode>0755</directoryMode>
+			<includes>
+				<include>config.php</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+  
+</assembly>
