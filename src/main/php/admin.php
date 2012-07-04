@@ -17,6 +17,13 @@ $GLOBALS['PUBLIC_FILES_DIR'] = $GLOBALS['SC_ROOT'] . '/files';
 $GLOBALS['PUBLIC_IMAGES_URL'] = 'images';
 $GLOBALS['PUBLIC_FILES_URL'] = 'files';
 
+$GLOBALS['SERVICE_URL.'] = 'sitecake/${project.version}/server/service.php';
+$GLOBALS['SITECAKE_EDITOR_LOGIN_URL'] = 
+	'sitecake/${project.version}/client/publicmanager/publicmanager.nocache.js';
+$GLOBALS['SITECAKE_EDITOR_EDIT_URL'] = 'sitecake/${project.version}/client/' .
+	'contentmanager/contentmanager.nocache.js';
+$GLOBALS['CONFIG_URL.'] = 'sitecake/editor.cfg';
+
 define('SERVER_DIR', realpath(__DIR__));
 set_include_path(
 	SERVER_DIR . '/application' . PATH_SEPARATOR .

@@ -84,6 +84,12 @@
 										<include name="**/*"/>
 									</fileset>
 								</copy>
+								<copy todir="${project.build.testOutputDirectory}/web/basic/sitecake/0.0.0/client">
+									<fileset dir="${project.build.directory}/php-test-deps">
+										<include name="publicmanager/**/*"/>
+										<include name="contentmanager/**/*"/>
+									</fileset>
+								</copy>
 							</target>
 						</configuration>
 						<goals>
@@ -145,7 +151,17 @@
             <groupId>com.sitecake</groupId>
             <artifactId>sitecake-editor-client</artifactId>
             <version>1.1.0</version>
-            <scope>runtime</scope>
+            <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+		    		<groupId>com.sitecake</groupId>
+		    		<artifactId>sitecake-editor-edit</artifactId>
+            	</exclusion>
+            	<exclusion>
+		    		<groupId>com.sitecake</groupId>
+		    		<artifactId>sitecake-editor-login</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>        
     </dependencies>
 

@@ -153,11 +153,12 @@ class renderer {
 	static function assemble($pageFile, $isLogin) {
 		$tpl = phpQuery::newDocument(renderer::loadPageFile($pageFile));
 		renderer::adjustNavMenu($tpl);
-		renderer::injectClientCode($tpl, $isLogin);
 		renderer::normalizeContainerNames($tpl);
-		//if (!$isLogin) {
+		$isDraft = false;
+		if (!$isLogin) {
 			renderer::injectDraftContent($tpl, $pageFile);
-		//}
+		}
+		renderer::injectClientCode($tpl, $isLogin, $isDraft);
 		return http::response($tpl);
 	}
 	
@@ -218,23 +219,65 @@ class renderer {
 		return $tpl;
 	}
 	
-	static function injectClientCode($tpl, $isLogin) {
-		phpQuery::pq('head', $tpl)->append(renderer::clientCode($isLogin));	
+	static function injectClientCode($tpl, $isLogin, $isDraft) {
+		phpQuery::pq('head', $tpl)->append(
+			renderer::clientCode($isLogin, $isDraft));	
 		return $tpl;
 	}
 	
-	static function clientCode($isLogin) {
+	static function clientCode($isLogin, $isDraft) {
 		return $isLogin ? 
-			renderer::clientCodeLogin() : renderer::clientCodeEdit();
+			renderer::clientCodeLogin() : renderer::clientCodeEdit($isDraft);
 	}
 	
 	static function clientCodeLogin() {
-		return '<!-- sitecake login -->';
+		$globals = "var sitecakeGlobals = {".
+			"editMode: false, " .
+			"sessionId: '<session id>', " .
+			"serverVersionId: 'SiteCake CMS ${project.version}', " .
+			"sessionServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
+				"?controller=session', " .
+			"configUrl:'" . $GLOBALS['CONFIG_URL.'] .
+					"?controller=session', " .
+			"forceLoginDialog: true" .
+		"};";
+				
+		return 
+			renderer::wrapToScriptTag($globals) .
+			renderer::scriptTag($GLOBALS['SITECAKE_EDITOR_LOGIN_URL']);
 	}
 	
-	static function clientCodeEdit() {
-		return '<!-- sitecake edit -->';
+	static function clientCodeEdit($isDraft) {
+		$globals = "var sitecakeGlobals = {".
+			"editMode: true, " .
+			"sessionId: '<session id>', " .
+			"serverVersionId: 'SiteCake CMS ${project.version}', " .
+			"sessionServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
+				"?controller=session', " .
+			"uploadServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
+				"?controller=upload', " .
+			"contentServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
+				"?controller=content', " .
+			"configUrl:'" . $GLOBALS['CONFIG_URL.'] .
+				"?controller=session', " .				
+			"draftPublished: " . ($isDraft ? 'false' : 'true') .
+		"};";
+				
+		return
+			'<meta http-equiv="X-UA-Compatible" content="chrome=1">' .
+			renderer::wrapToScriptTag($globals) .
+			renderer::scriptTag($GLOBALS['SITECAKE_EDITOR_EDIT_URL']);
 	}
+	
+	static function wrapToScriptTag($code) {
+		return '<script type="text/javascript">' . $code . '</script>';
+	}
+	
+	static function scriptTag($url) {
+		return '<script type="text/javascript" language="javascript" src="' .
+			$url . '"></script>';	
+	}
+	
 	
 	static function injectDraftContent($tpl, $pageFile) {
 		$containers = renderer::containers($tpl);
