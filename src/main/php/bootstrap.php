@@ -21,22 +21,23 @@ $GLOBALS['PUBLIC_FILES_URL'] = 'files';
 
 $GLOBALS['SERVICE_URL.'] = 'sitecake/${project.version}/server/service.php';
 $GLOBALS['SITECAKE_EDITOR_LOGIN_URL'] =
-'sitecake/${project.version}/client/publicmanager/publicmanager.nocache.js';
+	'sitecake/${project.version}/client/publicmanager/publicmanager.nocache.js';
 $GLOBALS['SITECAKE_EDITOR_EDIT_URL'] = 'sitecake/${project.version}/client/' .
-'contentmanager/contentmanager.nocache.js';
+	'contentmanager/contentmanager.nocache.js';
 $GLOBALS['CONFIG_URL.'] = 'sitecake/editor.cfg';
 
 define('SERVER_DIR', realpath(__DIR__));
 set_include_path(
-SERVER_DIR . '/application' . PATH_SEPARATOR .
-SERVER_DIR . '/lib'
+	SERVER_DIR . '/application' . PATH_SEPARATOR .
+	SERVER_DIR . '/lib'
 );
 
-spl_autoload_register(function($className)
-{
-require(str_replace('_', '/',
-		str_replace('\\', '/', ltrim($className, '\\'))) . '.php');
-	if(method_exists($className, '__static_init')) {
-		$className::__static_init();
-}
-});
+spl_autoload_register(
+	function($className) {
+		require(str_replace('_', '/',
+				str_replace('\\', '/', ltrim($className, '\\'))) . '.php');
+		if(method_exists($className, '__static_init')) {
+			$className::__static_init();
+		}
+	}
+);

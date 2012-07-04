@@ -28,15 +28,16 @@ $GLOBALS['CONFIG_URL.'] = 'sitecake/editor.cfg';
 
 define('SERVER_DIR', realpath(__DIR__ . '/../../../../../../../../src/main/php'));
 set_include_path(
-SERVER_DIR . '/application' . PATH_SEPARATOR .
-SERVER_DIR . '/../lib'
+	SERVER_DIR . '/application' . PATH_SEPARATOR .
+	SERVER_DIR . '/../lib'
 );
 
-spl_autoload_register(function($className)
-{
-require(str_replace('_', '/',
-str_replace('\\', '/', ltrim($className, '\\'))) . '.php');
-	if(method_exists($className, '__static_init')) {
-		$className::__static_init();
-}
-});
+spl_autoload_register(
+	function($className) {
+		require(str_replace('_', '/',
+			str_replace('\\', '/', ltrim($className, '\\'))) . '.php');
+		if(method_exists($className, '__static_init')) {
+			$className::__static_init();
+		}
+	}
+);
