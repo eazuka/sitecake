@@ -235,10 +235,8 @@ class renderer {
 			"editMode: false, " .
 			"sessionId: '<session id>', " .
 			"serverVersionId: 'SiteCake CMS ${project.version}', " .
-			"sessionServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
-				"?controller=session', " .
-			"configUrl:'" . $GLOBALS['CONFIG_URL.'] .
-					"?controller=session', " .
+			"sessionServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . "', " .
+			"configUrl:'" . $GLOBALS['CONFIG_URL.'] . "', " .
 			"forceLoginDialog: true" .
 		"};";
 				
@@ -252,14 +250,10 @@ class renderer {
 			"editMode: true, " .
 			"sessionId: '<session id>', " .
 			"serverVersionId: 'SiteCake CMS ${project.version}', " .
-			"sessionServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
-				"?controller=session', " .
-			"uploadServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
-				"?controller=upload', " .
-			"contentServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . 
-				"?controller=content', " .
-			"configUrl:'" . $GLOBALS['CONFIG_URL.'] .
-				"?controller=session', " .				
+			"sessionServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . "', " .
+			"uploadServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . "', " .
+			"contentServiceUrl:'" . $GLOBALS['SERVICE_URL.'] . "', " .
+			"configUrl:'" . $GLOBALS['CONFIG_URL.'] . "', " .				
 			"draftPublished: " . ($isDraft ? 'false' : 'true') .
 		"};";
 				

@@ -10,7 +10,7 @@ if ( ($phpVersion[0]*10 + $phpVersion[1]) < 53 ) {
 		PHP version 5.3 (or greater) is required.");
 }
 
-$GLOBALS['SC_ROOT'] = realpath(__DIR__ . '/../../../../../../../../target/test-classes/web/basic');
+$GLOBALS['SC_ROOT'] = realpath(__DIR__ . '/../../../.');
 
 $GLOBALS['DRAFT_CONTENT_DIR'] = $GLOBALS['SC_ROOT'] . '/sitecake-content';
 $GLOBALS['DRAFT_CONTENT_URL'] = 'sitecake-content';
@@ -21,12 +21,13 @@ $GLOBALS['PUBLIC_FILES_URL'] = 'files';
 
 $GLOBALS['SERVICE_URL.'] = 'sitecake/0.0.0/server/service.php';
 $GLOBALS['SITECAKE_EDITOR_LOGIN_URL'] =
-'sitecake/0.0.0/client/publicmanager/publicmanager.nocache.js';
+	'sitecake/0.0.0/client/publicmanager/publicmanager.nocache.js';
 $GLOBALS['SITECAKE_EDITOR_EDIT_URL'] = 'sitecake/0.0.0/client/' .
-'contentmanager/contentmanager.nocache.js';
+	'contentmanager/contentmanager.nocache.js';
 $GLOBALS['CONFIG_URL.'] = 'sitecake/editor.cfg';
 
-define('SERVER_DIR', realpath(__DIR__ . '/../../../../../../../../src/main/php'));
+define('SERVER_DIR', realpath(__DIR__ . '/../../../../../../../src/main/php'));
+
 set_include_path(
 	SERVER_DIR . '/application' . PATH_SEPARATOR .
 	SERVER_DIR . '/../lib'

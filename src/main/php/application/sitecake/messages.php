@@ -10,5 +10,7 @@ $messagesMap = array(
 	'NO_PAGE_EXISTS' => 'No page file (*.html) could be found in {0}',
 	'INDEX_PAGE_NOT_EXISTS' => 'Could not find the index page (index.html) in {0}',
 	
-	'PAGE_NOT_EXISTS' => 'Could not load page file {0}'
+	'PAGE_NOT_EXISTS' => 'Could not load page file {0}',
+	
+	'INVALID_SERVICE_REQUEST' => 'Invalid service request {0}'
 );
