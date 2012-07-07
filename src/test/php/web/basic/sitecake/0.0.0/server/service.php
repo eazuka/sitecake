@@ -1,5 +1,6 @@
 <?php
 include('bootstrap.php');
+include($GLOBALS['CREDENTIALS_FILE']);
 
 use sitecake\http,
 	sitecake\resources;

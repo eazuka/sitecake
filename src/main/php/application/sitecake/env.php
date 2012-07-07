@@ -7,7 +7,8 @@ class env {
 			env::ensureDirectory($GLOBALS['SC_ROOT'], false, true),
 			env::ensureDirectory($GLOBALS['DRAFT_CONTENT_DIR']),
 			env::ensureDirectory($GLOBALS['PUBLIC_IMAGES_DIR']),
-			env::ensureDirectory($GLOBALS['PUBLIC_FILES_DIR']));
+			env::ensureDirectory($GLOBALS['PUBLIC_FILES_DIR']),
+			env::ensureDirectory($GLOBALS['TEMP']));
 	}
 	
 	/**
@@ -21,17 +22,17 @@ class env {
 	static function ensureDirectory($path, $create = true, $writable = true) {
 		$errors = array();
 		
-		if (!file_exists($path)) {
+		if (!io::file_exists($path)) {
 			if (!$create) {
 				array_push($errors,
 					resources::message('DIR_NOT_EXISTS', $path));
-			} elseif (!mkdir($path, 0775, true)) {
+			} elseif (!io::mkdir($path, 0775, true)) {
 				array_push($errors,
 					resources::message('DIR_NOT_CREATED', $path));
 			}
 		}
 		
-		if ($writable && !is_writable($path)) {
+		if ($writable && !io::is_writable($path)) {
 			array_push($errors, 
 				resources::message('DIR_NOT_WRITABLE', $path));
 		}

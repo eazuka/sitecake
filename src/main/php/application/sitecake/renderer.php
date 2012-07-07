@@ -108,12 +108,12 @@ class renderer {
 	static function pageFiles() {
 		$path = $GLOBALS['SC_ROOT'];
 		
-		if (!is_readable($path)) {
+		if (!io::is_readable($path)) {
 			throw new Exception(
 				resources::message('PAGE_DIR_NOT_READABLE', $path));
 		}
 		
-		$htmlFiles = glob($path . DS . '*.html');
+		$htmlFiles = io::glob($path . DS . '*.html');
 	
 		if ($htmlFiles === false || empty($htmlFiles)) {
 			throw new Exception(
@@ -134,13 +134,13 @@ class renderer {
 	}
 	
 	static function loadPageFile($path) {
-		if (!is_readable($path))
+		if (!io::is_readable($path))
 			throw new Exception('PAGE_NOT_EXISTS', $path);
-		return file_get_contents($path);
+		return io::file_get_contents($path);
 	}
 	
 	static function savePageFile($path, $content) {
-		file_put_contents($path, $content);
+		io::file_put_contents($path, $content);
 	}
 	
 	/**
@@ -180,7 +180,7 @@ class renderer {
 	
 	static function normalizeContainerNames($tpl) {
 		$cnt = 0;
-		foreach ( phpQuery::pq('[class*="sc-content"], [class*="sc-repeater-"]', 
+		foreach (phpQuery::pq('[class*="sc-content"], [class*="sc-repeater-"]', 
 				$tpl) as $node) {
 			$container = phpQuery::pq($node, $tpl);
 			$class = $container->attr('class');
@@ -312,8 +312,9 @@ class renderer {
 	static function loadDraftContent($pageId) {
 		$draft = array();
 		$path = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $pageId . '.json';
-		if (is_readable($path)) {
-			$draft = Json::decode($path, Json::TYPE_ARRAY);
+		if (io::is_readable($path)) {
+			$draft = Json::decode(
+				io::file_get_contents($path), Json::TYPE_ARRAY);
 		}
 		return $draft;
 	}

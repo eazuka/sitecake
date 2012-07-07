@@ -19,7 +19,8 @@ class service {
 	}
 	
 	static function change(Request $req) {
-		return service::response($req->query(), 
+		$params = $req->query();
+		return service::response($params, 
 			session::change($params['credential'], $params['newCredential']));
 	}
 

@@ -25,6 +25,8 @@ $GLOBALS['SITECAKE_EDITOR_LOGIN_URL'] =
 $GLOBALS['SITECAKE_EDITOR_EDIT_URL'] = 'sitecake/${project.version}/client/' .
 	'contentmanager/contentmanager.nocache.js';
 $GLOBALS['CONFIG_URL.'] = 'sitecake/editor.cfg';
+$GLOBALS['CREDENTIALS_FILE'] = realpath(__DIR__ . '/../../credential.php');
+$GLOBALS['TEMP'] = $GLOBALS['SC_ROOT'] . '/sitecake-content/tmp';
 
 define('SERVER_DIR', realpath(__DIR__));
 set_include_path(

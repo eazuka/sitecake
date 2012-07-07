@@ -20,8 +20,8 @@ class content {
 	*
 	* @return array the service response
 	*/
-	static function save( $params ) {
-		
+	static function save($params) {
+		return array('status' => -1, 'errorMessage' => 'not implemented');
 	}
 	
 	/**
@@ -40,7 +40,7 @@ class content {
 	 *
 	 * @return array the service response
 	 */
-	static function publish( $params ) {
-		
+	static function publish($params) {
+		return array('status' => -1, 'errorMessage' => 'not implemented');
 	}
 }

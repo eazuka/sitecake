@@ -19,12 +19,25 @@ class session {
 	* <code>errorMessage</code> - string, present if <code>status</code> 
 	* 	is -1 or 3
 	*
-	* @param string $credential the authentication credential, SHA1 hex hash of
+	* @param string $crdnt the authentication credential, SHA1 hex hash of
 	* 	the admin password
 	* @return array the service response
 	*/
-	static function login($credential) {
-		return array('status' => -1, 'errorMessage' => 'not implemented');
+	static function login($crdnt) {
+		global $credential;
+		
+		if ( $crdnt != $credential ) {
+			return array('status' => 1);
+		}
+		
+		if (lock::exists('loginLock')) {
+			return array('status' => 1);
+		}
+		
+		session_start();
+		$_SESSION['loggedin'] = true;
+		lock::create('loginLock', 20);
+		return array('status' => 0);
 	}
 	
 	/**
@@ -44,8 +57,16 @@ class session {
 	 * @param string $newCredential the new credential
 	 * @return array the service response
 	 */
-	static function change($credential, $newCredential) {
-		return array('status' => -1, 'errorMessage' => 'not implemented');
+	static function change($crdnt, $newCredential) {
+		global $credential;
+	
+		if ( $crdnt != $credential ) {
+			return array('status' => 1);
+		}
+		file_put_contents($GLOBALS['CREDENTIALS_FILE'], 
+			'<?php $credential = "'.$newCredential.'"; ?>');
+		
+		return array('status' => 0);
 	}
 	
 	/**
@@ -59,7 +80,13 @@ class session {
 	 * @return array the service response
 	 */
 	static function logout() {
-		return array('status' => -1, 'errorMessage' => 'not implemented');
+		session_start();
+		
+    	if ($_SESSION['loggedin'] === true ) {
+    		$_SESSION['loggedin'] = false;
+    		lock::remove('loginLock');
+    	}
+    	return array('status' => 0);    	
 	}
 	
 	/**
@@ -73,7 +100,12 @@ class session {
 	 * @return array the service response
 	 */
 	static function alive() {
-		return array('status' => -1, 'errorMessage' => 'not implemented');
+		session_start();
+		
+    	if ($_SESSION['loggedin'] === true ) {
+    		lock::reset('loginLock');
+    	}
+    	return array('status' => 0);    	
 	}
 	
 }
