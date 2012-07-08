@@ -14,9 +14,9 @@ class content {
 	* 	is -1 or 1
 	*
 	* @param array $params the page content in the following format:
-	* __sc_page - the page name
-	* __sc_content_<container name> - the content of the container 
-	* 	(<container name>)
+	* 	scpageid - the sc page id
+	* 	sc-content-<name>(sc-repeater-<name>) - the content of the container 
+	* 		(or repeater) <name>
 	*
 	* @return array the service response
 	*/
@@ -36,7 +36,7 @@ class content {
 	 * 	is -1 or 1
 	 *
 	 * @param array $params the page content in the following format:
-	 * __sc_page - the page name
+	 * scpageid - the page name
 	 *
 	 * @return array the service response
 	 */

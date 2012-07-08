@@ -30,6 +30,10 @@ class io {
 	
 	}
 	
+	static function copy($source, $dest, $context = null) {
+		return $context ? copy($source, $dest, $context) : copy($source, $dest);	
+	}
+	
 	static function filemtime($filename) {
 		return filemtime($filename);
 	}
@@ -52,4 +56,21 @@ class io {
 		return glob($pattern, $flags);
 	}
 	
+	static function fopen($filename, $mode, $use_include_path = false, 
+			$context = null) {
+		return $context ? fopen($filename, $mode, $use_include_path, $context) :
+			fopen($filename, $mode, $use_include_path);
+	}
+	
+	static function fclose($handle) {
+		return fclose($handle);
+	}
+	
+	static function fread($handle, $length = null) {
+		return fread($handle, $length);
+	}
+	
+	static function fwrite($handle, $string, $length = null) {
+		return fwrite($handle, $string, $length);
+	}
 }

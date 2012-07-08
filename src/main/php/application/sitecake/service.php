@@ -29,6 +29,10 @@ class service {
 			session::alive());
 	}
 	
+	static function upload(Request $req) {
+		return service::response($req->query(), upload::upload($req));	
+	}
+	
 	private static function response($params, $data)
 	{
 		return http::response(isset($params['callback']) ? 
