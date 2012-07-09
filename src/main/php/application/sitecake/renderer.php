@@ -108,11 +108,6 @@ class renderer {
 	static function pageFiles() {
 		$path = $GLOBALS['SC_ROOT'];
 		
-		if (!io::is_readable($path)) {
-			throw new Exception(
-				resources::message('PAGE_DIR_NOT_READABLE', $path));
-		}
-		
 		$htmlFiles = io::glob($path . DS . '*.html');
 	
 		if ($htmlFiles === false || empty($htmlFiles)) {
@@ -121,7 +116,7 @@ class renderer {
 		}
 		
 		$pageFiles = array();
-		foreach ( $htmlFiles as $htmlFile ) {
+		foreach ($htmlFiles as $htmlFile) {
 			$pageFiles[basename($htmlFile)] = $htmlFile;
 		}
 		
@@ -185,6 +180,18 @@ class renderer {
 			$class = $container->attr('class');
 			if (preg_match('/(^|\s)sc\-content($|\s)/', $class, $matches))
 			$container->addClass('sc-content-' . $cnt++);
+		}
+		return $tpl;		
+	}
+	
+	static function cleanupContainerNames($tpl) {
+		foreach (phpQuery::pq('[class*="sc-content-"], [class*="sc-repeater-"]',
+				$tpl) as $node) {
+			$container = phpQuery::pq($node, $tpl);
+			$class = $container->attr('class');
+			if (preg_match('/(^|\s)(sc\-content\-[^\s]+|sc\-repeater\-[^\s]+)/', $class, $matches)) {
+				$container->removeClass($matches[2]);
+			}
 		}
 		return $tpl;		
 	}

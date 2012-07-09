@@ -1,6 +1,8 @@
 <?php
 namespace sitecake;
 
+use \phpQuery\phpQuery as phpQuery;
+
 class content {
 	/**
 	* Saves the given page content into the respective content containers.
@@ -55,10 +57,25 @@ class content {
 	 * @return array the service response
 	 */
 	static function publish($params) {
-		return array('status' => -1, 'errorMessage' => 'not implemented');
+		$id = $params['scpageid'];
+		$pageFiles = renderer::pageFiles();
+		foreach ($pageFiles as $pageFile) {
+			$html = io::file_get_contents($pageFile);
+			if (preg_match('/\\s+scpageid="'.$id.'";/', $html)) {
+				$tpl = phpQuery::newDocument($html);
+				renderer::normalizeContainerNames($tpl);
+				renderer::injectDraftContent($tpl, $pageFile);
+				renderer::cleanupContainerNames($tpl);
+				renderer::savePageFile($pageFile, (string)$tpl);
+				break;
+			}
+		}
+		draft::delete($id);
+		return array('status' => 0);
 	}
 	
 	static function process_save($old, $new) {
-		
+		// find all img tages and their data attributes
+		// if the data is changed, transform the image
 	}
 }

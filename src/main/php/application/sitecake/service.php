@@ -37,6 +37,10 @@ class service {
 		return service::response($req->query(), content::save($req->post()));	
 	}
 	
+	static function publish(Request $req) {
+		return service::response($req->query(), content::publish($req->post()));
+	}
+		
 	private static function response($params, $data)
 	{
 		return http::response(isset($params['callback']) ? 

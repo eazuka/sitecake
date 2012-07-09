@@ -27,6 +27,16 @@ class draft {
 		}
 	}
 	
+	static function getAll() {
+		$drafts = array();
+		$paths = io::glob($GLOBALS['DRAFT_CONTENT_DIR'] . DS . '*.drf');
+		foreach ($paths as $path) {
+			$id = basename($path, '.drf');
+			$drafts[$id] = draft::get($id);
+		}
+		return $drafts;
+	}
+	
 	static function path($id) {
 		return $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $id . '.drf';
 	}
