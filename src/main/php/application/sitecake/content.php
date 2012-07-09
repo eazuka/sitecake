@@ -21,7 +21,21 @@ class content {
 	* @return array the service response
 	*/
 	static function save($params) {
-		return array('status' => -1, 'errorMessage' => 'not implemented');
+		$id = $params['scpageid'];
+		$draft = draft::get($id);
+		foreach ($params as $container => $data) {
+			if ($container == 'scpageid') continue;
+			// remove slashes
+			if (get_magic_quotes_gpc())
+				$data = stripcslashes($data);	
+			$data = base64_decode($data);
+			if (!empty($data)) {
+				content::process_save($draft[$container], $data);
+			}
+			$draft[$container] = $data;		
+		}
+		draft::update($id, $draft);
+		return array('status' => 0);
 	}
 	
 	/**
@@ -42,5 +56,9 @@ class content {
 	 */
 	static function publish($params) {
 		return array('status' => -1, 'errorMessage' => 'not implemented');
+	}
+	
+	static function process_save($old, $new) {
+		
 	}
 }

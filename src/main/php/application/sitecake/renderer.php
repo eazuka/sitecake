@@ -154,11 +154,10 @@ class renderer {
 		$tpl = phpQuery::newDocument(renderer::loadPageFile($pageFile));
 		renderer::adjustNavMenu($tpl);
 		renderer::normalizeContainerNames($tpl);
-		$isDraft = false;
 		if (!$isLogin) {
 			renderer::injectDraftContent($tpl, $pageFile);
 		}
-		renderer::injectClientCode($tpl, $isLogin, $isDraft);
+		renderer::injectClientCode($tpl, $pageFile, $isLogin);
 		return http::response($tpl);
 	}
 	
@@ -219,9 +218,10 @@ class renderer {
 		return $tpl;
 	}
 	
-	static function injectClientCode($tpl, $isLogin, $isDraft) {
+	static function injectClientCode($tpl, $pageFile, $isLogin) {
+		$pageId = renderer::pageId($tpl, $pageFile);
 		phpQuery::pq('head', $tpl)->append(
-			renderer::clientCode($isLogin, $isDraft));	
+			renderer::clientCode($isLogin, draft::exists($pageId)));	
 		return $tpl;
 	}
 	
@@ -272,21 +272,15 @@ class renderer {
 			$url . '"></script>';	
 	}
 	
-	
 	static function injectDraftContent($tpl, $pageFile) {
 		$containers = renderer::containers($tpl);
-		$content = renderer::draftContent($tpl, $pageFile, $containers);
-		foreach ($containers as $container) {
-			if (isset($content[$container])) {
+		$content = draft::get(renderer::pageId($tpl, $pageFile));
+		foreach ($containers as $container => $repeater) {
+			if (array_key_exists($container, $content)) {
 				renderer::setContent($tpl, $container, $content[$container]);
 			}
 		}
 		return $tpl;
-	}
-	
-	static function draftContent($tpl, $pageFile, $containers) {
-		$id = renderer::pageId($tpl, $pageFile);
-		return renderer::loadDraftContent($id);
 	}
 	
 	static function id() {
@@ -294,29 +288,19 @@ class renderer {
 	}
 	
 	static function pageId($tpl, $pageFile) {
-		if (preg_match('/\\s+scpageid=([^;]+);/', 
+		if (preg_match('/\\s+scpageid="([^"]+)"/', 
 				(string)(phpQuery::pq('head', $tpl)->html()), $matches)) {
 			return $matches[1];
 		} else {
 			$id = renderer::id();
 			$origTpl = phpQuery::newDocument(renderer::loadPageFile($pageFile));
 			phpQuery::pq('head', $origTpl)->append(
-				'<!-- scpageid=' . $id . '; -->');
+				renderer::wrapToScriptTag('var scpageid="' . $id . '";'));
 			phpQuery::pq('head', $tpl)->append(
-				'<!-- scpageid=' . $id . '; -->');
+				renderer::wrapToScriptTag('var scpageid="' . $id . '";'));
 			renderer::savePageFile($pageFile, (string)$origTpl);
 			return $id;
 		}
-	}
-	
-	static function loadDraftContent($pageId) {
-		$draft = array();
-		$path = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $pageId . '.json';
-		if (io::is_readable($path)) {
-			$draft = Json::decode(
-				io::file_get_contents($path), Json::TYPE_ARRAY);
-		}
-		return $draft;
 	}
 	
 	static function setContent($tpl, $container, $content) {

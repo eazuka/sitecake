@@ -33,6 +33,10 @@ class service {
 		return service::response($req->query(), upload::upload($req));	
 	}
 	
+	static function save(Request $req) {
+		return service::response($req->query(), content::save($req->post()));	
+	}
+	
 	private static function response($params, $data)
 	{
 		return http::response(isset($params['callback']) ? 
