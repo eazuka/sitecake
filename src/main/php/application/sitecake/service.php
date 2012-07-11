@@ -40,7 +40,11 @@ class service {
 	static function publish(Request $req) {
 		return service::response($req->query(), content::publish($req->post()));
 	}
-		
+	
+	static function upgrade(Request $req) {
+		return service::response($req->query(), upgrade::perform());	
+	}
+	
 	private static function response($params, $data)
 	{
 		return http::response(isset($params['callback']) ? 
