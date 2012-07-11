@@ -2,7 +2,7 @@
 namespace sitecake;
 
 use \Exception as Exception;
-use Zend\Json\Json as Json;
+use Zend\Json\Json as json;
 use Zend\Http\Request as Request;
 
 class service {
@@ -44,7 +44,7 @@ class service {
 	private static function response($params, $data)
 	{
 		return http::response(isset($params['callback']) ? 
-				$params['callback'] . '(' . Json::encode($data) . ')' :
-				Json::encode($data));
+				$params['callback'] . '(' . json::encode($data) . ')' :
+				json::encode($data));
 	}	
 }
