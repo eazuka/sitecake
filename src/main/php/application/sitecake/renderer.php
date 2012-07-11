@@ -150,7 +150,8 @@ class renderer {
 		renderer::adjustNavMenu($tpl);
 		renderer::normalizeContainerNames($tpl);
 		if (!$isLogin) {
-			renderer::injectDraftContent($tpl, $pageFile);
+			renderer::injectDraftContent($tpl, 
+				draft::get(renderer::pageId($tpl, $pageFile)));
 		}
 		renderer::injectClientCode($tpl, $pageFile, $isLogin);
 		return http::response($tpl);
@@ -279,9 +280,8 @@ class renderer {
 			$url . '"></script>';	
 	}
 	
-	static function injectDraftContent($tpl, $pageFile) {
+	static function injectDraftContent($tpl, $content) {
 		$containers = renderer::containers($tpl);
-		$content = draft::get(renderer::pageId($tpl, $pageFile));
 		foreach ($containers as $container => $repeater) {
 			if (array_key_exists($container, $content)) {
 				renderer::setContent($tpl, $container, $content[$container]);

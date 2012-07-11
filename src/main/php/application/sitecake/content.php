@@ -59,12 +59,13 @@ class content {
 	static function publish($params) {
 		$id = $params['scpageid'];
 		$pageFiles = renderer::pageFiles();
+		$draft = draft::get($id);
 		foreach ($pageFiles as $pageFile) {
 			$html = io::file_get_contents($pageFile);
 			if (preg_match('/\\s+scpageid="'.$id.'";/', $html)) {
 				$tpl = phpQuery::newDocument($html);
 				renderer::normalizeContainerNames($tpl);
-				renderer::injectDraftContent($tpl, $pageFile);
+				renderer::injectDraftContent($tpl, $draft);
 				renderer::cleanupContainerNames($tpl);
 				renderer::savePageFile($pageFile, (string)$tpl);
 				break;
