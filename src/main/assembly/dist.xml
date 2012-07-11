@@ -58,14 +58,6 @@
 				<include>credential.php.default</include>
 			</includes>
 		</fileSet>
-		<fileSet>
-			<outputDirectory>/sitecake/${project.version}/server</outputDirectory>
-			<directory>src/main/resources</directory>
-			<directoryMode>0755</directoryMode>
-			<includes>
-				<include>config.php</include>
-			</includes>
-		</fileSet>
 	</fileSets>
   
 </assembly>
