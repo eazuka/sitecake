@@ -1,2 +1,1 @@
-<?php
-	include "sitecake/${project.version}/server/admin.php";
+<?php include "sitecake/${project.version}/server/admin.php";
