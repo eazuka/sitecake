@@ -85,7 +85,7 @@
 									</fileset>
 								</copy>
 								<copy todir="${project.build.testOutputDirectory}/web/basic/sitecake/0.0.0/client">
-									<fileset dir="${project.build.directory}/php-test-deps">
+									<fileset dir="${project.build.directory}/php-deps">
 										<include name="publicmanager/**/*"/>
 										<include name="contentmanager/**/*"/>
 									</fileset>
