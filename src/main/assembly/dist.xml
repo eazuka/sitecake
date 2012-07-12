@@ -16,6 +16,11 @@
 			<outputDirectory>/sitecake/${project.version}/client</outputDirectory>
 			<useProjectArtifact>false</useProjectArtifact>
 			<unpack>true</unpack>
+			<unpackOptions>
+				<excludes>
+					<exclude>META-INF</exclude>
+				</excludes>
+			</unpackOptions>
 			<directoryMode>0755</directoryMode>
 			<includes>
 				<include>com.sitecake:sitecake-editor-client</include>
