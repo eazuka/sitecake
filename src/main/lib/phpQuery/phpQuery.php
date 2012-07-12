@@ -9,7 +9,8 @@ use \Iterator as Iterator,
 	\DOMNode as DOMNode,
 	\DOMDocument as DOMDocument,
 	\DOMElement as DOMElement,
-	\DOMNodeList as DOMNodeList;
+	\DOMNodeList as DOMNodeList,
+	\Exception as Exception;
 
 /**
  * phpQuery is a server-side, chainable, CSS3 selector driven
