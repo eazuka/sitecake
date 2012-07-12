@@ -5,6 +5,12 @@ include($GLOBALS['CREDENTIALS_FILE']);
 use sitecake\http,
 	sitecake\resources;
 
+$errors = \sitecake\env::ensure();
+if (!empty($errors)) {
+	sitecake\http::send(
+		sitecake\http::errorResponse(implode('<br/>', $errors)));
+}
+
 $action = isset($_GET['action']) ? $_GET['action'] : false;
 
 if ($action && method_exists('\sitecake\service', $action)) {
