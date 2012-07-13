@@ -31,7 +31,7 @@
 	<fileSets>	
 		<fileSet>
 			<outputDirectory>/</outputDirectory>
-			<directory>target/classes</directory>
+			<directory>${project.build.outputDirectory}</directory>
 			<directoryMode>0755</directoryMode>
 			<includes>
 				<include>sc-admin.php</include>
@@ -47,15 +47,18 @@
 		</fileSet>		
 		<fileSet>
 			<outputDirectory>/sitecake/${project.version}/server</outputDirectory>
-			<directory>src/main/php</directory>
+			<directory>${project.build.outputDirectory}</directory>
 			<directoryMode>0755</directoryMode>
-			<includes>
-				<include>**/*</include>
-			</includes>
+			<excludes>
+				<exclude>sc-admin.php</exclude>
+				<exclude>editor.cfg</exclude>
+				<exclude>credential.php</exclude>
+				<exclude>credential.php.default</exclude>				
+			</excludes>
 		</fileSet>		
 		<fileSet>
 			<outputDirectory>/sitecake</outputDirectory>
-			<directory>src/main/resources</directory>
+			<directory>${project.build.outputDirectory}</directory>
 			<directoryMode>0755</directoryMode>
 			<includes>
 				<include>editor.cfg</include>

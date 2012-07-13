@@ -29,12 +29,15 @@
 	
 	<fileSets>	
 		<fileSet>
-			<outputDirectory>/${project.version}/server/lib</outputDirectory>
-			<directory>src/main/lib</directory>
+			<outputDirectory>/sitecake/${project.version}/server</outputDirectory>
+			<directory>${project.build.outputDirectory}</directory>
 			<directoryMode>0755</directoryMode>
-			<includes>
-				<include>**/*</include>
-			</includes>
+			<excludes>
+				<exclude>sc-admin.php</exclude>
+				<exclude>editor.cfg</exclude>
+				<exclude>credential.php</exclude>
+				<exclude>credential.php.default</exclude>				
+			</excludes>
 		</fileSet>		
 		<fileSet>
 			<outputDirectory>/${project.version}/server</outputDirectory>
