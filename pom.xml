@@ -13,7 +13,7 @@
     </properties>
 
     <groupId>com.sitecake</groupId>
-    <artifactId>server</artifactId>
+    <artifactId>sitecake</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>php</packaging>
 
