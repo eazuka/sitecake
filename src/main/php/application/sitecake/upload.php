@@ -53,6 +53,7 @@ class upload {
 				$result['thumbnailWidth'] = img::getWidth();
 				$result['thumbnailHeight'] = img::getHeight();
 				img::unload();
+				meta::put($thumbId, array('orig' => $file));
 			}
 		
 			if (isset($_SERVER['HTTP_X_IMAGEUPLOAD_RESIZEWIDTH']) && 
@@ -73,6 +74,7 @@ class upload {
 				$result['resizedWidth'] = img::getWidth();
 				$result['resizedHeight'] = img::getHeight();
 				img::unload();
+				meta::put($resizedId, array('orig' => $file));
 			}
 		} else {
 			$result['url'] = $GLOBALS['DRAFT_CONTENT_URL'] . '/' . 
