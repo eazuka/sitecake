@@ -31,7 +31,7 @@ class session {
 		}
 		
 		if (lock::exists('loginLock')) {
-			return array('status' => 1);
+			return array('status' => 2);
 		}
 		
 		session_start();
