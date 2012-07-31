@@ -2,6 +2,8 @@
 namespace sitecake;
 
 use \phpQuery\phpQuery as phpQuery;
+use \WideImage\img as img;
+use \Zend\Json\Json as json;
 
 class content {
 	/**
@@ -32,7 +34,9 @@ class content {
 				$data = stripcslashes($data);	
 			$data = base64_decode($data);
 			if (!empty($data)) {
-				content::process_save($draft[$container], $data);
+				$data = content::process_save(
+					array_key_exists($container, $draft) ? 
+					$draft[$container] : '', $data);
 			}
 			$draft[$container] = $data;		
 		}
@@ -76,7 +80,80 @@ class content {
 	}
 	
 	static function process_save($old, $new) {
-		// find all img tages and their data attributes
-		// if the data is changed, transform the image
+		$oldDoc = phpQuery::newDocumentXHTML($old);
+		$newDoc = phpQuery::newDocumentXHTML($new);
+		foreach (phpQuery::pq('img', $newDoc) as $imgNode) {
+			$img = phpQuery::pq($imgNode, $newDoc);
+			$url = $img->attr('src');
+			$data = $img->attr('data');
+			$oldImg = phpQuery::pq("img[src='$url']", $oldDoc);
+			if (!$oldImg || $oldImg->attr('data') != $data) {
+				$img->attr('src', content::process_image($url, $data));
+			}
+		}
+		return (string)$newDoc;
+	}
+	
+	static function process_image($url, $data) {
+		$info = content::image_info($url);
+		
+		$path = $info['path'];
+		if (!io::file_exists($path))
+			return $url;
+		
+		$id = $info['id'];
+		if (meta::exists($id)) {
+			// if the image already a draft image
+			// just replace it
+			$spath = meta::get($id, 'orig');
+			content::transform_image($spath, $path, $data);
+			return $url;
+		} else {
+			// otherwise, if the image is a template image, transform the image
+			// and save it as a new draft
+			$id = renderer::id();
+			$name = $id . '.' . $info['ext'];
+			$dpath = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $name;
+			content::transform_image($path, $dpath, $data);
+			meta::put($id, array('orig' => $path));
+			return $GLOBALS['DRAFT_CONTENT_URL'] . '/' . $name;
+		}
+	}
+	
+	static function image_info($url) {
+		return array(
+			'id' => reset(explode('.', end(explode('/', $url)))),
+			'ext' => end(explode('.', end(explode('/', $url)))),
+			'path' => $GLOBALS['SC_ROOT'] . DS . $url,
+			'name' => basename($GLOBALS['SC_ROOT'] . DS . $url)
+		);
+	}
+	
+	static function transform_image($spath, $dpath, $data) {
+		$datas = explode(':', $data);
+		$srcWidth = $datas[0];
+		$srcHeight = $datas[1];
+		$srcX = $datas[2];
+		$srcY = $datas[3];
+		$dstWidth = $datas[4];
+		$dstHeight = $datas[5];
+		
+		img::load($spath);
+			
+		$origWidth = img::getWidth();
+		$origHeight = img::getHeight();
+		
+		$xRatio = $origWidth / $srcWidth;
+		$yRatio = $origHeight / $srcHeight;
+		
+		$srcWidth = $dstWidth * $xRatio;
+		$srcHeight= $dstHeight * $yRatio;
+		$srcX = $srcX * $xRatio;
+		$srcY = $srcY * $yRatio;
+		
+		img::transform($srcX, $srcY, $srcWidth, $srcHeight, 
+			$dstWidth, $dstHeight);
+		img::save($dpath);
+		img::unload();
 	}
 }
