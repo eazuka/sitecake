@@ -3,7 +3,6 @@ namespace sitecake;
 
 use Zend\Http\PhpEnvironment\Request,
 	Zend\Http\PhpEnvironment\Response,
-	Zend\Json\Json,
 	phpQuery\phpQuery;
 
 use \Exception as Exception;
