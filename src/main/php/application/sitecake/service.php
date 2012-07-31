@@ -7,6 +7,23 @@ use Zend\Http\Request as Request;
 
 class service {
 	
+	static function execute($action, Request $req) {
+		if ($action == null && empty($ation) && 
+				!method_exists('\sitecake\service', $action)) {
+			return service::response($req->query(),
+				array('status' => -1, 'errorMessage' => resources::message(
+					'INVALID_SERVICE_REQUEST', $_SERVER['REQUEST_URI'])));
+		}
+				
+		if (service::auth() || 
+				$action == 'login' || $action != 'change') {
+			return service::$action($req);
+		} else {
+			return service::response($req->query(), 
+				array('status' => -1, 'errorMessage' => 'Not authorized'));
+		}		
+	}
+	
 	static function login(Request $req) {
 		$params = $req->query();
 		return service::response($params, 
@@ -45,10 +62,15 @@ class service {
 		return service::response($req->query(), upgrade::perform());	
 	}
 	
+	private static function auth() {	
+		session_start();
+		return ($_SESSION['loggedin'] === true);
+	}
+	
 	private static function response($params, $data)
 	{
+		$body = json::encode($data);
 		return http::response(isset($params['callback']) ? 
-				$params['callback'] . '(' . json::encode($data) . ')' :
-				json::encode($data));
-	}	
+				$params['callback'] . '(' . $body . ')' : $body);
+	}
 }
