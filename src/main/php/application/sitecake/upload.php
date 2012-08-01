@@ -27,7 +27,7 @@ class upload {
 				isset($_SERVER['HTTP_X_IMAGEUPLOAD_THUMBDIM']);
 		}
 		
-		$id = renderer::id();
+		$id = util::id();
 		$file = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $id . 
 			($fileExt ? '.' . $fileExt : '');
 			
@@ -42,7 +42,7 @@ class upload {
 				
 			if (isset($_SERVER['HTTP_X_IMAGEUPLOAD_THUMBDIM'])) {
 				$thumbnailDimension = $_SERVER['HTTP_X_IMAGEUPLOAD_THUMBDIM'];
-				$thumbId = renderer::id();
+				$thumbId = util::id();
 				$thumbFile = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . 
 					$thumbId .	($fileExt ? '.' . $fileExt : '');
 				img::load($file);
@@ -53,13 +53,13 @@ class upload {
 				$result['thumbnailWidth'] = img::getWidth();
 				$result['thumbnailHeight'] = img::getHeight();
 				img::unload();
-				meta::put($thumbId, array('orig' => $file));
+				meta::put($thumbId, array('orig' => util::rpath($file)));
 			}
 		
 			if (isset($_SERVER['HTTP_X_IMAGEUPLOAD_RESIZEWIDTH']) && 
 					$_SERVER['HTTP_X_IMAGEUPLOAD_RESIZEWIDTH'] != 0 ) {
 				$resizedWidth = $_SERVER['HTTP_X_IMAGEUPLOAD_RESIZEWIDTH'];
-				$resizedId = renderer::id();
+				$resizedId = util::id();
 				$resizedFile = $GLOBALS['DRAFT_CONTENT_DIR'] . DS .
 					$resizedId .	($fileExt ? '.' . $fileExt : '');
 				img::load($file);
@@ -74,7 +74,7 @@ class upload {
 				$result['resizedWidth'] = img::getWidth();
 				$result['resizedHeight'] = img::getHeight();
 				img::unload();
-				meta::put($resizedId, array('orig' => $file));
+				meta::put($resizedId, array('orig' => util::rpath($file)));
 			}
 		} else {
 			$result['url'] = $GLOBALS['DRAFT_CONTENT_URL'] . '/' . 
