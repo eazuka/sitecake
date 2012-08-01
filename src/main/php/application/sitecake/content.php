@@ -72,6 +72,11 @@ class content {
 				renderer::injectDraftContent($tpl, $draft);
 				renderer::cleanupContainerNames($tpl);
 				renderer::savePageFile($pageFile, (string)$tpl);
+				$repeaters = content::repeaters($draft);
+				if (!empty($repeaters)) {
+					content::pass_repeaters($pageFiles, $pageFile, $repeaters);
+				}				
+				draft::delete($id);
 				break;
 			}
 		}
@@ -105,17 +110,17 @@ class content {
 		if (meta::exists($id)) {
 			// if the image already a draft image
 			// just replace it
-			$spath = meta::get($id, 'orig');
+			$spath = util::apath(meta::get($id, 'orig'));
 			content::transform_image($spath, $path, $data);
 			return $url;
 		} else {
 			// otherwise, if the image is a template image, transform the image
 			// and save it as a new draft
-			$id = renderer::id();
+			$id = util::id();
 			$name = $id . '.' . $info['ext'];
 			$dpath = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $name;
 			content::transform_image($path, $dpath, $data);
-			meta::put($id, array('orig' => $path));
+			meta::put($id, array('orig' => util::rpath($path)));
 			return $GLOBALS['DRAFT_CONTENT_URL'] . '/' . $name;
 		}
 	}
@@ -156,4 +161,28 @@ class content {
 		img::save($dpath);
 		img::unload();
 	}
+	
+	static function repeaters($containers) {
+		$repeaters = array();
+		foreach ($containers as $key => $val) {
+			if (preg_match('/^sc\-content\-_rep_.+$/', $key))
+				$repeaters[$key] = $val;	
+		}
+		return $repeaters;
+	}
+	
+	static function pass_repeaters($pageFiles, $currPageFile, $repeaters) {
+		foreach ($pageFiles as $pageFile) {
+			if ($pageFile == $currPageFile) continue;
+			$html = io::file_get_contents($pageFile);
+			if (preg_match('/sc\-repeater\-/', $html)) {
+				$tpl = phpQuery::newDocument($html);
+				renderer::normalizeContainerNames($tpl);
+				renderer::injectDraftContent($tpl, $repeaters);
+				renderer::cleanupContainerNames($tpl);
+				renderer::savePageFile($pageFile, (string)$tpl);
+			}			
+		}
+	}
+	
 }

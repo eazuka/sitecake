@@ -178,8 +178,12 @@ class renderer {
 				$tpl) as $node) {
 			$container = phpQuery::pq($node, $tpl);
 			$class = $container->attr('class');
-			if (preg_match('/(^|\s)sc\-content($|\s)/', $class, $matches))
-			$container->addClass('sc-content-' . $cnt++);
+			if (preg_match('/(^|\s)sc\-content($|\s)/', $class, $matches)) {
+				$container->addClass('sc-content-_cnt_' . $cnt++);
+			} else if (preg_match('/(^|\s)sc\-repeater-([^\s]+)($|\s)/', 
+					$class, $matches)) {
+				$container->addClass('sc-content-_rep_' . $matches[2]);
+			}
 		}
 		return $tpl;		
 	}
@@ -189,7 +193,8 @@ class renderer {
 				$tpl) as $node) {
 			$container = phpQuery::pq($node, $tpl);
 			$class = $container->attr('class');
-			if (preg_match('/(^|\s)(sc\-content\-[^\s]+|sc\-repeater\-[^\s]+)/', $class, $matches)) {
+			if (preg_match('/(^|\s)(sc\-content\-(_cnt_|_rep_)[^\s]+)/', 
+					$class, $matches)) {
 				$container->removeClass($matches[2]);
 			}
 		}
@@ -201,14 +206,14 @@ class renderer {
 		foreach (phpQuery::pq('[class*="sc-content-"], [class*="sc-repeater-"]',
 				$tpl) as $node) {
 			$cNode = phpQuery::pq($node, $tpl);
-			if (preg_match('/(^|\s)(sc-content-[^\s]+)/', $cNode->attr('class'),
+			if (preg_match('/(^|\s)(sc-content-_rep_[^\s]+)/', $cNode->attr('class'),
 					$matches)) {
-				$containers[$matches[2]] = false;
+				$containers[$matches[2]] = true;
 			}
 			else {
-				preg_match('/(^|\s)sc-repeater-([^\s]+)/', 
+				preg_match('/(^|\s)(sc-content-[^\s]+)/', 
 					$cNode->attr('class'), $matches);
-				$containers[$matches[2]] = true;
+				$containers[$matches[2]] = false;
 			}
 		}
 		return $containers;			
@@ -289,16 +294,12 @@ class renderer {
 		return $tpl;
 	}
 	
-	static function id() {
-		return sha1(uniqid('', true));
-	}
-	
 	static function pageId($tpl, $pageFile) {
 		if (preg_match('/\\s+scpageid="([^"]+)"/', 
 				(string)(phpQuery::pq('head', $tpl)->html()), $matches)) {
 			return $matches[1];
 		} else {
-			$id = renderer::id();
+			$id = util::id();
 			$origTpl = phpQuery::newDocument(renderer::loadPageFile($pageFile));
 			phpQuery::pq('head', $origTpl)->append(
 				renderer::wrapToScriptTag('var scpageid="' . $id . '";'));
