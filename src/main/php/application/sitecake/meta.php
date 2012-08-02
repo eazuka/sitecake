@@ -29,6 +29,20 @@ class meta {
 	}
 	
 	/**
+	 * Returns all existing meta data IDs.
+	 * 
+	 * @return array 
+	 */
+	static function ids() {
+		$metas = array();
+		$paths = io::glob($GLOBALS['DRAFT_CONTENT_DIR'] . DS . '*.meta');
+		foreach ($paths as $path) {
+			array_push($metas, basename($path, '.meta'));
+		}
+		return $metas;
+	}
+	
+	/**
 	 * Saves the given meta data for the specified object id. Any existing data
 	 * will be replaced.
 	 * 

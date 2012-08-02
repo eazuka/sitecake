@@ -10,6 +10,7 @@ use \Exception as Exception;
 class renderer {
 	static function process() {
 		try {
+			renderer::purge();
 			http::send(renderer::response(http::request()));
 		} catch (Exception $e) {
 			http::send(http::errorResponse('<h2>Exception: </h2><b>' . 
@@ -313,4 +314,49 @@ class renderer {
 	static function setContent($tpl, $container, $content) {
 		phpQuery::pq('.' . $container, $tpl)->html($content);
 	}
+	
+	static function purge() {
+		$used = renderer::used_references();
+		print_r($used);
+		foreach (meta::ids() as $id) {
+			if (!in_array($id, $used)) {
+				renderer::purge_res($id);
+			}
+		}
+	}
+	
+	static function purge_res($id) {
+		$meta = meta::get($id);
+		if (isset($meta['orig'])) {
+			$origPath = util::apath($meta['orig']);
+			if (strpos($origPath, $GLOBALS[DRAFT_CONTENT_DIR]) === 0) {
+				io::unlink($origPath);
+			}
+		}
+		meta::remove($id);
+		io::unlink(util::apath($meta['path']));
+		$fpath = $GLOBALS['PUBLIC_FILES_DIR'] . DS . $meta['name'];
+		if (io::file_exists($fpath)) io::unlink($fpath);
+		$ipath = $GLOBALS['PUBLIC_IMAGES_DIR'] . DS . $meta['name'];
+		if (io::file_exists($ipath)) io::unlink($ipath);		
+	}
+	
+	static function used_references() {
+		$refs = array();
+		foreach (renderer::pageFiles() as $path) {
+			$refs = array_merge($refs, 
+				renderer::extract_refs(io::file_get_contents($path)));
+		}
+		
+		foreach (draft::getAll(true) as $drf) {
+			$refs = array_merge($refs, renderer::extract_refs($drf));
+		}
+		return $refs;
+	}
+	
+	static function extract_refs($text) {
+		preg_match_all('/\/([0-9abcdef]{40})\./', $text, $matches);
+		return $matches[1];
+	}
+
 }

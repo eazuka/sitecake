@@ -120,7 +120,11 @@ class content {
 			$name = $id . '.' . $info['ext'];
 			$dpath = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $name;
 			content::transform_image($path, $dpath, $data);
-			meta::put($id, array('orig' => util::rpath($path)));
+			meta::put($id, array(
+				'orig' => util::rpath($path),
+				'path' => util::rpath($dpath),
+				'name' => $name
+			));
 			return $GLOBALS['DRAFT_CONTENT_URL'] . '/' . $name;
 		}
 	}
