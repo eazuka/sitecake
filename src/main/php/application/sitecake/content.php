@@ -2,6 +2,7 @@
 namespace sitecake;
 
 use \phpQuery\phpQuery as phpQuery;
+use \phpQuery\DOMDocumentWrapper as DOMDocumentWrapper;
 use \WideImage\img as img;
 use \Zend\Json\Json as json;
 
@@ -63,7 +64,7 @@ class content {
 	static function publish($params) {
 		$id = $params['scpageid'];
 		$pageFiles = renderer::pageFiles();
-		$draft = draft::get($id);
+		$draft = content::publish_res(draft::get($id));
 		foreach ($pageFiles as $pageFile) {
 			$html = io::file_get_contents($pageFile);
 			if (preg_match('/\\s+scpageid="'.$id.'";/', $html)) {
@@ -71,6 +72,7 @@ class content {
 				renderer::normalizeContainerNames($tpl);
 				renderer::injectDraftContent($tpl, $draft);
 				renderer::cleanupContainerNames($tpl);
+				content::publish_cleanup($tpl);
 				renderer::savePageFile($pageFile, (string)$tpl);
 				$repeaters = content::repeaters($draft);
 				if (!empty($repeaters)) {
@@ -85,8 +87,8 @@ class content {
 	}
 	
 	static function process_save($old, $new) {
-		$oldDoc = phpQuery::newDocumentXHTML($old);
-		$newDoc = phpQuery::newDocumentXHTML($new);
+		$oldDoc = phpQuery::newDocumentXHTML(content::fixXHTML($old));
+		$newDoc = phpQuery::newDocumentXHTML(content::fixXHTML($new));
 		foreach (phpQuery::pq('img', $newDoc) as $imgNode) {
 			$img = phpQuery::pq($imgNode, $newDoc);
 			$url = $img->attr('src');
@@ -99,6 +101,13 @@ class content {
 		return (string)$newDoc;
 	}
 	
+	static function fixXHTML($markup) {
+		$markup = DOMDocumentWrapper::expandEmptyTag('br', $markup);
+		$markup = DOMDocumentWrapper::expandEmptyTag('img', $markup);
+		$markup = DOMDocumentWrapper::expandEmptyTag('textarea', $markup);
+		return $markup;
+	}
+	
 	static function process_image($url, $data) {
 		$info = content::image_info($url);
 		
@@ -106,13 +115,17 @@ class content {
 		if (!io::file_exists($path))
 			return $url;
 		
-		$id = $info['id'];
+		$id = $info['id'];	
 		if (meta::exists($id)) {
 			// if the image already a draft image
-			// just replace it
-			$spath = util::apath(meta::get($id, 'orig'));
-			content::transform_image($spath, $path, $data);
-			return $url;
+			$meta = meta::get($id);
+			$spath = util::apath($meta['orig']);
+			$dpath = $GLOBALS['DRAFT_CONTENT_DIR'] . DS . $meta['name'];
+			$meta['path'] = util::rpath($dpath);
+			$meta['data'] = $data;
+			content::transform_image($spath, $dpath, $data);
+			meta::put($id, $meta);
+			return $GLOBALS['DRAFT_CONTENT_URL'] . '/' . $meta['name'];
 		} else {
 			// otherwise, if the image is a template image, transform the image
 			// and save it as a new draft
@@ -123,7 +136,8 @@ class content {
 			meta::put($id, array(
 				'orig' => util::rpath($path),
 				'path' => util::rpath($dpath),
-				'name' => $name
+				'name' => $name,
+				'data' => $data
 			));
 			return $GLOBALS['DRAFT_CONTENT_URL'] . '/' . $name;
 		}
@@ -166,6 +180,41 @@ class content {
 		img::unload();
 	}
 	
+	static function publish_cleanup($tpl) {
+		foreach (phpQuery::pq(
+				'*[class*="sc-content"] img, *[class*="sc-repeater"] img', 
+				$tpl) as $imgNode) {
+			$img = phpQuery::pq($imgNode, $tpl);
+			$img->removeAttr('data');
+		}		
+	}
+	
+	static function publish_res($draft) {
+		$mod = array();
+		foreach ($draft as $container => $html) {
+			preg_match_all('/\\ssrc=("|\')' . $GLOBALS['DRAFT_CONTENT_URL'] . 
+				'\/([0-9abcdef]{40}\.[^"\'\\s]+)/', $html, $matches);
+			content::move_draft_res($matches[2], $GLOBALS['PUBLIC_IMAGES_DIR']);
+			preg_match_all('/\\shref=("|\')' . $GLOBALS['DRAFT_CONTENT_URL'] . 
+				'\/([0-9abcdef]{40}\.[^"\'\\s]+)/', $html, $matches);
+			content::move_draft_res($matches[2], $GLOBALS['PUBLIC_FILES_DIR']);
+			$h = preg_replace(
+				'/\\ssrc=("|\')' . $GLOBALS['DRAFT_CONTENT_URL'] . '\//', 
+				' src=$1' . $GLOBALS['PUBLIC_IMAGES_URL'] . '/', $html);
+			$mod[$container] = preg_replace(
+				'/\\shref=("|\')' . $GLOBALS['DRAFT_CONTENT_URL'] . '\//', 
+				' href=$1' . $GLOBALS['PUBLIC_FILES_URL'] . '/', $h);
+		}
+		return $mod;
+	}
+	
+	static function move_draft_res($names, $dpath) {
+		foreach ($names as $name) {
+			io::rename($GLOBALS['DRAFT_CONTENT_DIR'] . DS . $name, 
+				$dpath . DS . $name);
+		}	
+	}
+	
 	static function repeaters($containers) {
 		$repeaters = array();
 		foreach ($containers as $key => $val) {
@@ -183,6 +232,7 @@ class content {
 				$tpl = phpQuery::newDocument($html);
 				renderer::normalizeContainerNames($tpl);
 				renderer::injectDraftContent($tpl, $repeaters);
+				content::publish_cleanup($tpl);
 				renderer::cleanupContainerNames($tpl);
 				renderer::savePageFile($pageFile, (string)$tpl);
 			}			

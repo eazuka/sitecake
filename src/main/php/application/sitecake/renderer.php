@@ -10,8 +10,8 @@ use \Exception as Exception;
 class renderer {
 	static function process() {
 		try {
-			renderer::purge();
 			http::send(renderer::response(http::request()));
+			renderer::purge();
 		} catch (Exception $e) {
 			http::send(http::errorResponse('<h2>Exception: </h2><b>' . 
 				$e->getMessage() . "</b><br/>" .
@@ -152,6 +152,7 @@ class renderer {
 		if (!$isLogin) {
 			renderer::injectDraftContent($tpl, 
 				draft::get(renderer::pageId($tpl, $pageFile)));
+			renderer::img_data($tpl);
 		}
 		renderer::injectClientCode($tpl, $pageFile, $isLogin);
 		return http::response($tpl);
@@ -317,7 +318,6 @@ class renderer {
 	
 	static function purge() {
 		$used = renderer::used_references();
-		print_r($used);
 		foreach (meta::ids() as $id) {
 			if (!in_array($id, $used)) {
 				renderer::purge_res($id);
@@ -329,7 +329,8 @@ class renderer {
 		$meta = meta::get($id);
 		if (isset($meta['orig'])) {
 			$origPath = util::apath($meta['orig']);
-			if (strpos($origPath, $GLOBALS[DRAFT_CONTENT_DIR]) === 0) {
+			if (strpos($origPath, $GLOBALS[DRAFT_CONTENT_DIR]) === 0 &&
+					io::file_exists($origPath)) {
 				io::unlink($origPath);
 			}
 		}
@@ -357,6 +358,24 @@ class renderer {
 	static function extract_refs($text) {
 		preg_match_all('/\/([0-9abcdef]{40})\./', $text, $matches);
 		return $matches[1];
+	}
+	
+	static function img_data($tpl) {
+		foreach (phpQuery::pq(
+				'*[class*="sc-content"] img, *[class*="sc-repeater"] img', 
+				$tpl) as $imgNode) {
+			$img = phpQuery::pq($imgNode, $tpl);
+			$data = $img->attr('data');
+			if (!$data || '' == $data) {
+				$info = content::image_info($img->attr('src'));
+				if (meta::exists($info['id'])) {
+					$meta = meta::get($info['id']);
+					if (isset($meta['data'])) {
+						$img->attr('data', $meta['data']);
+					}
+				}
+			}
+		}		
 	}
 
 }
