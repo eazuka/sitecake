@@ -34,6 +34,11 @@ class io {
 		return $context ? copy($source, $dest, $context) : copy($source, $dest);	
 	}
 	
+	static function rename($oldname, $newname, $context = null) {
+		return $context ? rename($oldname, $newname, $context) : 
+			rename($oldname, $newname);	
+	}
+	
 	static function filemtime($filename) {
 		return filemtime($filename);
 	}
