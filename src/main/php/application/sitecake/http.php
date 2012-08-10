@@ -12,7 +12,10 @@ class http {
 	}
 	
 	static function request() {
-		return new Request();
+		if (!http::$req) {
+			http::$req = new Request();				
+		}
+		return http::$req;
 	}
 	
 	static function response($body) {
