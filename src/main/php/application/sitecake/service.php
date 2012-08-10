@@ -62,6 +62,13 @@ class service {
 		return service::response($req->query(), upgrade::perform());	
 	}
 	
+	static function pages(Request $req) {
+		$params = $req->post();
+		return service::response($req->query(), 
+			isset($params['pages']) ? pages::update(json::decode(
+				$params['pages'], json::TYPE_ARRAY)) : pages::all());
+	}
+	
 	private static function auth() {	
 		session_start();
 		return ($_SESSION['loggedin'] === true);

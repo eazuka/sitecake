@@ -18,6 +18,7 @@ $GLOBALS['PUBLIC_IMAGES_DIR'] = $GLOBALS['SC_ROOT'] . '/images';
 $GLOBALS['PUBLIC_FILES_DIR'] = $GLOBALS['SC_ROOT'] . '/files';
 $GLOBALS['PUBLIC_IMAGES_URL'] = 'images';
 $GLOBALS['PUBLIC_FILES_URL'] = 'files';
+$GLOBALS['SITE_MAP_FILE'] = $GLOBALS['SC_ROOT'] . DS . 'sitemap.xml';
 
 $GLOBALS['SERVICE_URL.'] = 'sitecake/0.0.0/server/service.php';
 $GLOBALS['SITECAKE_EDITOR_LOGIN_URL'] =
