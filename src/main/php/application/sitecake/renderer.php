@@ -51,55 +51,7 @@ class renderer {
 	static function pageUri($params) {
 		return isset($params['page']) ? $params['page'] : 'index.html';
 	}
-	
-	static function pages() {
-		$pages = array();
-		$pageFiles = renderer::pageFiles();
 		
-		$homeDoc = phpQuery::newDocument($pageFiles['index.html']);
-		
-		$homePage = Page::create();
-		$homePage->navMenuIndex = -1;
-		$homePage->external = false;
-		$homePage->uri = 'index.html';
-		$page->title = phpQuery::pq('title', $homeDoc)->text();
-		$page->description = phpQuery::pq(
-			'meta[name="description"]', $homeDoc)->attr('content');
-		$page->keywords = phpQuery::pq(
-			'meta[name="keywords"]', $homeDoc)->attr('content');
-		array_push($pages, $homePage);
-		
-		$navMenuIndex = 0;
-		foreach (phpQuery::pq('ul.sc-nav:first li a', $homeDoc) as $navNode) {
-			$node = phpQuery::pq($navNode, $homeDoc);
-			$href = $node->attr('href');
-			if ($href == 'index.html') {
-				$page = $homePage;
-			} else {
-				$page = Page::create();
-				array_push($pages, $page);
-			} 
-			$page->external = renderer::isExternalLink($href);
-			$page->uri = $page->external ? $href : basename($href);
-			$page->navMenuIndex = $navMenuIndex++;
-			$page->navDisplay = $node->text();
-			$page->navTitle = $node->attr('title') ?: $page->navDisplay;
-		
-			if (!$page->external && ($page != $homePage)) {
-				$pageHtml = renderer::loadPageFile($page->uri);
-				$pageDoc = phpQuery::newDocument($pageHtml);
-				$page->title = phpQuery::pq('title', $pageDoc)->text();
-				$page->description = phpQuery::pq(
-					'meta[name="description"]', $pageDoc)->attr('content');
-				$page->keywords = phpQuery::pq(
-					'meta[name="keywords"]', $pageDoc)->attr('content');
-			}
-			$page->title = $page->title ?: $page->navDisplay;
-		}
-
-		return $pages;	
-	}
-	
 	static function isExternalLink($url) {
 		return strpos($url, '/') || strpos($url, 'http://') || 
 			(substr($url, -5) != '.html');
@@ -130,7 +82,7 @@ class renderer {
 	
 	static function loadPageFile($path) {
 		if (!io::is_readable($path))
-			throw new Exception('PAGE_NOT_EXISTS', $path);
+			throw new Exception(resources::message('PAGE_NOT_EXISTS', $path));
 		return io::file_get_contents($path);
 	}
 	
@@ -156,22 +108,6 @@ class renderer {
 		}
 		renderer::injectClientCode($tpl, $pageFile, $isLogin);
 		return http::response($tpl);
-	}
-	
-	static function sitemap($pages, $reqest) {
-		$result = '<?xml version="1.0" encoding="UTF-8"?>' .
-			'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-		foreach ($pages as $page) {
-			if ($page == $pages[array_shift(array_keys($pages))])
-			$result .= '<url><loc>' . 'http://' . $request->host . 
-				$request->basePath . '</loc>' .
-				'<changefreq>monthly</changefreq></url>';
-			elseif (!$page->hidden && !$page->external)
-				$result .= '<url><loc>' . 'http://' . $request->host . 
-					$request->basePath . $page->uri . '</loc>' .
-					'<changefreq>monthly</changefreq></url>';
-		}
-		return $result . '</urlset>';		
 	}
 	
 	static function normalizeContainerNames($tpl) {
